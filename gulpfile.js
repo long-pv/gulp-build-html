@@ -2,7 +2,6 @@ const { src, dest, series, parallel, watch } = require("gulp");
 const fileInclude = require("gulp-file-include");
 const sass = require("gulp-sass")(require("sass"));
 const cleanCSS = require("gulp-clean-css");
-const htmlmin = require("gulp-htmlmin");
 const uglify = require("gulp-uglify");
 const concat = require("gulp-concat");
 const rename = require("gulp-rename");
@@ -10,6 +9,7 @@ const imagemin = require("gulp-imagemin");
 const del = require("del");
 const browserSync = require("browser-sync").create();
 
+// Đường dẫn nguồn và đích
 const paths = {
 	html: {
 		src: ["src/html/**/*.html", "!src/html/partials/**"],
@@ -42,26 +42,25 @@ const paths = {
 	},
 };
 
-// Clean dist folder
+// Xóa thư mục dist
 function clean() {
 	return del(["dist"]);
 }
 
-// HTML task
+// Xử lý HTML (chỉ include partials, không nén)
 function html() {
 	return src(paths.html.src)
 		.pipe(fileInclude({ prefix: "@@", basepath: "@file" }))
-		.pipe(htmlmin({ collapseWhitespace: true }))
 		.pipe(dest(paths.html.dest))
 		.pipe(browserSync.stream());
 }
 
-// Compile main.scss -> main.css
+// Build SCSS -> CSS (main.css)
 function styles() {
 	return src(paths.styles.src).pipe(sass().on("error", sass.logError)).pipe(cleanCSS()).pipe(rename("main.css")).pipe(dest(paths.styles.dest)).pipe(browserSync.stream());
 }
 
-// Compile vendor.scss -> vendor.css
+// Build vendor.scss -> vendor.css
 function vendorStyles() {
 	return src(paths.vendorStyles.src)
 		.pipe(sass({ url: false }).on("error", sass.logError))
@@ -71,7 +70,7 @@ function vendorStyles() {
 		.pipe(browserSync.stream());
 }
 
-// Compile main.js -> main.js (minify)
+// Build main.js -> main.js (minify)
 function scripts() {
 	return src(paths.scripts.src).pipe(uglify()).pipe(rename("main.js")).pipe(dest(paths.scripts.dest)).pipe(browserSync.stream());
 }
@@ -81,12 +80,12 @@ function vendorScripts() {
 	return src(paths.vendorScripts.src).pipe(concat("vendor.js")).pipe(dest(paths.vendorScripts.dest));
 }
 
-// Optimize images
+// Tối ưu ảnh
 function images() {
 	return src(paths.images.src).pipe(imagemin()).pipe(dest(paths.images.dest)).pipe(browserSync.stream());
 }
 
-// Serve with BrowserSync + watch files
+// Serve + Watch files
 function serve() {
 	browserSync.init({
 		server: { baseDir: "dist" },
@@ -102,7 +101,7 @@ function serve() {
 	watch(paths.images.watch, images);
 }
 
-// Tasks exports
+// Các tasks
 exports.clean = clean;
 exports.build = series(clean, parallel(html, styles, vendorStyles, scripts, vendorScripts, images));
 exports.default = series(exports.build, serve);

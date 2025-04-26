@@ -17,8 +17,13 @@ const paths = {
 		dest: "dist/",
 	},
 	styles: {
-		src: "src/scss/style.scss",
+		src: "src/scss/main.scss",
 		watch: "src/scss/**/*.scss",
+		dest: "dist/assets/css",
+	},
+	vendorStyles: {
+		src: "src/scss/vendor.scss",
+		watch: "src/scss/vendor.scss",
 		dest: "dist/assets/css",
 	},
 	scripts: {
@@ -26,9 +31,9 @@ const paths = {
 		watch: "src/js/**/*.js",
 		dest: "dist/assets/js",
 	},
-	vendor: {
-		css: ["node_modules/slick-carousel/slick/slick.css", "node_modules/slick-carousel/slick/slick-theme.css", "node_modules/animate.css/animate.min.css", "node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css", "node_modules/select2/dist/css/select2.min.css"],
-		js: ["node_modules/jquery/dist/jquery.min.js", "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js", "node_modules/slick-carousel/slick/slick.min.js", "node_modules/jquery-match-height/dist/jquery.matchHeight-min.js", "node_modules/jquery-validation/dist/jquery.validate.min.js", "node_modules/wowjs/dist/wow.min.js", "node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js", "node_modules/select2/dist/js/select2.min.js"],
+	vendorScripts: {
+		src: ["node_modules/jquery/dist/jquery.min.js", "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js", "node_modules/slick-carousel/slick/slick.min.js", "node_modules/jquery-match-height/dist/jquery.matchHeight-min.js", "node_modules/jquery-validation/dist/jquery.validate.min.js", "node_modules/wowjs/dist/wow.min.js", "node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js", "node_modules/select2/dist/js/select2.min.js"],
+		dest: "dist/assets/js",
 	},
 	images: {
 		src: "src/images/**/*",
@@ -37,60 +42,51 @@ const paths = {
 	},
 };
 
-// Clean dist
+// Clean dist folder
 function clean() {
 	return del(["dist"]);
 }
 
-// HTML build with include
+// HTML task
 function html() {
 	return src(paths.html.src)
-		.pipe(fileInclude({ prefix: "@@", basepath: "@file" })) // Chèn các partials vào
+		.pipe(fileInclude({ prefix: "@@", basepath: "@file" }))
 		.pipe(htmlmin({ collapseWhitespace: true }))
 		.pipe(dest(paths.html.dest))
 		.pipe(browserSync.stream());
 }
 
-// SCSS build -> style.css (bỏ timestamp)
+// Compile main.scss -> main.css
 function styles() {
-	return src(paths.styles.src)
-		.pipe(sass().on("error", sass.logError))
-		.pipe(cleanCSS())
-		.pipe(rename("style.css")) // Tên file là 'style.css'
-		.pipe(dest(paths.styles.dest))
-		.pipe(browserSync.stream());
+	return src(paths.styles.src).pipe(sass().on("error", sass.logError)).pipe(cleanCSS()).pipe(rename("main.css")).pipe(dest(paths.styles.dest)).pipe(browserSync.stream());
 }
 
-// Vendor CSS -> vendor.css
+// Compile vendor.scss -> vendor.css
 function vendorStyles() {
-	return src(paths.vendor.css)
+	return src(paths.vendorStyles.src)
+		.pipe(sass({ url: false }).on("error", sass.logError))
 		.pipe(cleanCSS())
-		.pipe(concat("vendor.css")) // Tên file là 'vendor.css'
-		.pipe(dest(paths.styles.dest)); // Output vào dist/assets/css
-}
-
-// JS build -> main.js (bỏ timestamp)
-function scripts() {
-	return src(paths.scripts.src)
-		.pipe(uglify())
-		.pipe(rename("main.js")) // Tên file là 'main.js'
-		.pipe(dest(paths.scripts.dest))
+		.pipe(rename("vendor.css"))
+		.pipe(dest(paths.vendorStyles.dest))
 		.pipe(browserSync.stream());
 }
 
-// Vendor JS -> vendor.js
+// Compile main.js -> main.js (minify)
+function scripts() {
+	return src(paths.scripts.src).pipe(uglify()).pipe(rename("main.js")).pipe(dest(paths.scripts.dest)).pipe(browserSync.stream());
+}
+
+// Bundle vendor JS -> vendor.js
 function vendorScripts() {
-	return src(paths.vendor.js)
-		.pipe(concat("vendor.js")) // Tên file là 'vendor.js'
-		.pipe(dest(paths.scripts.dest)); // Output vào dist/assets/js
+	return src(paths.vendorScripts.src).pipe(concat("vendor.js")).pipe(dest(paths.vendorScripts.dest));
 }
 
-// Image processing
+// Optimize images
 function images() {
-	return src(paths.images.src).pipe(imagemin()).pipe(dest(paths.images.dest));
+	return src(paths.images.src).pipe(imagemin()).pipe(dest(paths.images.dest)).pipe(browserSync.stream());
 }
 
-// Dev server
+// Serve with BrowserSync + watch files
 function serve() {
 	browserSync.init({
 		server: { baseDir: "dist" },
@@ -101,11 +97,12 @@ function serve() {
 	watch(paths.html.watch, html);
 	watch("src/html/partials/**/*.html", html);
 	watch(paths.styles.watch, styles);
+	watch(paths.vendorStyles.watch, vendorStyles);
 	watch(paths.scripts.watch, scripts);
 	watch(paths.images.watch, images);
 }
 
-// Tasks
+// Tasks exports
 exports.clean = clean;
-exports.build = series(clean, parallel(html, styles, scripts, vendorScripts, vendorStyles, images));
+exports.build = series(clean, parallel(html, styles, vendorStyles, scripts, vendorScripts, images));
 exports.default = series(exports.build, serve);

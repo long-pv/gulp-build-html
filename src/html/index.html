@@ -1,0 +1,45 @@
+<!-- src/html/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="assets/css/vendor.css"> <!-- Thêm vendor.css -->
+    <link rel="stylesheet" href="assets/css/style.css"> <!-- style.css -->
+</head>
+
+<body>
+
+    <!-- Include header -->
+    @@include('partials/header.html')
+
+    <!-- Main content of the page -->
+    <main>
+        <!-- Main content -->
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Welcome to Bootstrap Test - long xemer</h1>
+
+            <!-- Card -->
+            <div class="card" style="width: 18rem;">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's
+                        content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Include footer -->
+    @@include('partials/footer.html')
+
+    <script src="assets/js/vendor.js"></script> <!-- vendor.js -->
+    <script src="assets/js/main.js"></script> <!-- main.js -->
+</body>
+
+</html>

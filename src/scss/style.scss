@@ -1,0 +1,10 @@
+// Import base
+@import "base/variables";
+
+// Bootstrap gốc
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+// Import từng page
+@import "page/home";
+@import "page/about";
+@import "page/contact";

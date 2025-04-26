@@ -27,7 +27,7 @@ const paths = {
 		dest: "dist/assets/js",
 	},
 	vendor: {
-		css: ["node_modules/slick-carousel/slick/slick.css", "node_modules/animate.css/animate.min.css", "node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css", "node_modules/select2/dist/css/select2.min.css"],
+		css: ["node_modules/slick-carousel/slick/slick.css", "node_modules/slick-carousel/slick/slick-theme.css", "node_modules/animate.css/animate.min.css", "node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css", "node_modules/select2/dist/css/select2.min.css"],
 		js: ["node_modules/jquery/dist/jquery.min.js", "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js", "node_modules/slick-carousel/slick/slick.min.js", "node_modules/jquery-match-height/dist/jquery.matchHeight-min.js", "node_modules/jquery-validation/dist/jquery.validate.min.js", "node_modules/wowjs/dist/wow.min.js", "node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js", "node_modules/select2/dist/js/select2.min.js"],
 	},
 	images: {
